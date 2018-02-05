@@ -16,6 +16,10 @@ pip3 install -r requirements.txt
 ```
 Note: for MacOS, see http://pytorch.org/ for other OS.
 
+## Dataset
+
+Images and annotations are a [subset of ADE20K Dataset](http://sceneparsing.csail.mit.edu/). This dataset is build to predict a total of 150 classes.
+
 ## Usage
 
 ```
