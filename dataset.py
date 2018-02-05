@@ -6,12 +6,14 @@ import torch.utils.data as torchdata
 from torchvision import transforms
 from scipy.misc import imread, imresize
 
-from CONSTANTS import BATCH_SIZE
+from CONSTANTS import BATCH_SIZE, USE_CUDA
+
+ROOT_PATH = '/' if USE_CUDA else ''
 
 class Dataset(torchdata.Dataset):
     def __init__(self, root_folder, image_list, max_sample=-1, is_train=1):
-        self.root_img = './{}/dataset/images'.format(root_folder)
-        self.root_seg = './{}/dataset/annotations'.format(root_folder)
+        self.root_img = '{}{}/dataset/images'.format(ROOT_PATH, root_folder)
+        self.root_seg = '{}{}/dataset/annotations'.format(ROOT_PATH, root_folder)
         self.imgSize = 100
         self.segSize = 100
         self.is_train = is_train
@@ -97,7 +99,7 @@ class Dataset(torchdata.Dataset):
                                interp='nearest')
 
             # label to int from -1 to 149
-            seg = seg.astype(np.int) - 1
+            seg = seg.astype(np.int)
 
             # to torch tensor
             image = torch.from_numpy(img)
@@ -121,8 +123,8 @@ class Dataset(torchdata.Dataset):
 
 # Dataset and Loader
 def load_dataset(train_list, val_list, root_folder):
-    dataset_train = Dataset(root_folder, '{}/{}'.format(root_folder, train_list), is_train=1)
-    dataset_val = Dataset(root_folder, '{}/{}'.format(root_folder, val_list), is_train=0)
+    dataset_train = Dataset(root_folder, '{}{}/{}'.format(ROOT_PATH, root_folder, train_list), is_train=1)
+    dataset_val = Dataset(root_folder, '{}{}/{}'.format(ROOT_PATH, root_folder, val_list), is_train=0)
     loader_train = torch.utils.data.DataLoader(
         dataset_train,
         batch_size=BATCH_SIZE,
@@ -131,8 +133,8 @@ def load_dataset(train_list, val_list, root_folder):
         drop_last=True)
     loader_val = torch.utils.data.DataLoader(
         dataset_val,
-        batch_size=BATCH_SIZE,
+        batch_size=1,
         shuffle=False,
-        num_workers=1,
+        num_workers=0,
         drop_last=True) 
     return loader_train, loader_val
